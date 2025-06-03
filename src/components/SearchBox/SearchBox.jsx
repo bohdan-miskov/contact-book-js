@@ -3,11 +3,12 @@ import css from "./SearchBox.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import { changeFilter } from "../../redux/filtersSlice";
 import { useDebouncedCallback } from "use-debounce";
+import { selectFilterValue } from "../../redux/filters/selector";
 
 export default function SearchBox() {
   const dispatch = useDispatch();
   const id = useId();
-  const searchValue = useSelector((state) => state.filters.name);
+  const searchValue = useSelector(selectFilterValue);
 
   const debounced = useDebouncedCallback(
     (value) => dispatch(handleChangeQuery(value)),
