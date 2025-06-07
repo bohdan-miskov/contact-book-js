@@ -3,20 +3,30 @@ import * as Yup from "yup";
 import "yup-phone-lite";
 import { useId } from "react";
 import css from "./ContactForm.module.css";
-import { useDispatch } from "react-redux";
-import { addContact } from "../../redux/contactsOps";
+import { useDispatch, useSelector } from "react-redux";
+import { addContact, editContact } from "../../redux/contacts/operations";
+import { selectEditingContact } from "../../redux/contacts/selectors";
+import { clearEditId } from "../../redux/contacts/slice";
 
 export default function ContactForm() {
   const id = useId();
   const dispatch = useDispatch();
+  const editingContact = useSelector(selectEditingContact);
 
   const handleAddContact = (contact) => dispatch(addContact(contact));
+  const handleEditContact = (editData) => dispatch(editContact(editData));
+
   const handleSubmit = (values, helpers) => {
-    handleAddContact({
-      name: values.username,
-      number: values.number,
-      createdAt: new Date(),
-    });
+    const newContact = { name: values.username, number: values.number };
+    if (editingContact) {
+      handleEditContact({
+        newContact,
+        id: editingContact.id,
+      });
+      clearEditId();
+    } else {
+      handleAddContact(newContact);
+    }
     helpers.resetForm();
   };
 
@@ -31,8 +41,8 @@ export default function ContactForm() {
   });
 
   const initialValues = {
-    username: "",
-    number: "",
+    username: editingContact?.name ?? "",
+    number: editingContact?.number ?? "",
   };
 
   return (
@@ -40,6 +50,7 @@ export default function ContactForm() {
       onSubmit={handleSubmit}
       validationSchema={ContactSchema}
       initialValues={initialValues}
+      enableReinitialize={true}
     >
       <Form className={css.form}>
         <label className={css.label} htmlFor={`${id}-username`}>
@@ -67,7 +78,7 @@ export default function ContactForm() {
         />
         <ErrorMessage className={css.errorMsg} name="number" component="span" />
         <button className={css.buttonAdd} type="submit">
-          Add contact
+          {editingContact ? "Save contact" : "Add contact"}
         </button>
       </Form>
     </Formik>

@@ -1,8 +1,8 @@
 .container {
   margin: 0 auto;
-  width: calc(250px * 3 + 16px * 5);
   padding: 0 16px;
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 16px;
 }

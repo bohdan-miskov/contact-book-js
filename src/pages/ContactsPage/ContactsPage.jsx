@@ -1,5 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
-import { selectError, selectLoading } from "../../redux/contacts/selectors";
+import {
+  selectContactsError,
+  selectContactsLoading,
+} from "../../redux/contacts/selectors";
 import { getContacts } from "../../redux/contacts/operations";
 import { useEffect } from "react";
 import ContactForm from "../../components/ContactForm/ContactForm";
@@ -10,8 +13,8 @@ import ContactList from "../../components/ContactList/ContactList";
 
 export default function ContactsPage() {
   const dispatch = useDispatch();
-  const loading = useSelector(selectLoading);
-  const error = useSelector(selectError);
+  const loading = useSelector(selectContactsLoading);
+  const error = useSelector(selectContactsError);
 
   useEffect(() => {
     const fetchContacts = async () => await dispatch(getContacts());
@@ -24,7 +27,7 @@ export default function ContactsPage() {
       <ContactForm />
       <SearchBox />
       {loading && <Loader />}
-      {error && <ErrorMessage />}
+      {error && <ErrorMessage>Something was wrong</ErrorMessage>}
       <ContactList />
     </>
   );

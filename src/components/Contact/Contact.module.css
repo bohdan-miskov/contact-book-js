@@ -20,21 +20,17 @@
 .info {
   display: inline-block;
 }
-.btnRemove {
-  padding: 8px;
+.btnList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.btnOps {
+  border: 1px solid black;
+  padding: 4px;
   border-radius: 12px;
   cursor: pointer;
-  font-weight: 500;
   text-align: center;
   display: block;
   background-color: rgb(39, 129, 138);
-  color: #fafafa;
-}
-.date {
-  font-size: 14px;
-  font-style: italic;
-  font-weight: 500;
-  position: absolute;
-  top: 4px;
-  right: 6px;
 }

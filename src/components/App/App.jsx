@@ -1,7 +1,14 @@
 import "./App.css";
-import Navigation from "../Navigation/Navigation";
-import { Routes } from "react-router-dom";
-import { lazy } from "react";
+import { Route, Routes } from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
+import RestrictedRoute from "../RestrictedRoute";
+import PrivateRoute from "../PrivateRoute";
+import { useDispatch, useSelector } from "react-redux";
+import { selectAuthIsRefreshing } from "../../redux/auth/selectors";
+import Loader from "../Loader/Loader";
+import Refreshing from "../Refreshing/Refreshing";
+import Layout from "../Layout/Layout";
+import { refreshUser } from "../../redux/auth/operations";
 
 const HomePage = lazy(() => import("../../pages/HomePage/HomePage"));
 const ContactsPage = lazy(() =>
@@ -16,17 +23,39 @@ const NotFoundPage = lazy(() =>
 );
 
 function App() {
-  return (
+  const dispatch = useDispatch();
+  const isRefreshing = useSelector(selectAuthIsRefreshing);
+
+  useEffect(() => {
+    dispatch(refreshUser());
+  }, [dispatch]);
+
+  return isRefreshing ? (
     <>
-      <Navigation />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/contacts" element={<ContactsPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+      <Refreshing />
+      <Loader />
     </>
+  ) : (
+    <Layout>
+      <Suspense fallback={null}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/contacts"
+            element={<PrivateRoute component={<ContactsPage />} />}
+          />
+          <Route
+            path="/register"
+            element={<RestrictedRoute component={<RegisterPage />} />}
+          />
+          <Route
+            path="/login"
+            element={<RestrictedRoute component={<LoginPage />} />}
+          />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Suspense>
+    </Layout>
   );
 }
 

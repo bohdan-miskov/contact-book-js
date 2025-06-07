@@ -1,10 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-axios.defaults.baseURL = "https://connections-api.goit.global";
+axios.defaults.baseURL = "https://connections-api.goit.global/";
 
 const setAuthHeader = (token) => {
-  axios.defaults.headers.common.Authorization = `Bearer: ${token}`;
+  axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 };
 
 const clearAuthHeader = () => {
@@ -16,11 +16,10 @@ export const signUp = createAsyncThunk(
   async (user, thunkApi) => {
     try {
       const response = await axios.post("/users/signup", user);
-      console.log("🚀 ~ response:", response);
-      setAuthHeader("");
+      setAuthHeader(response.data.token);
       return response.data;
     } catch (error) {
-      thunkApi.rejectWithValue(error.message);
+      return thunkApi.rejectWithValue(error.message);
     }
   }
 );
@@ -30,10 +29,10 @@ export const logIn = createAsyncThunk(
   async (userData, thunkApi) => {
     try {
       const response = await axios.post("/users/login", userData);
-      console.log("🚀 ~ response:", response);
+      setAuthHeader(response.data.token);
       return response.data;
     } catch (error) {
-      thunkApi.rejectWithValue(error.message);
+      return thunkApi.rejectWithValue(error.message);
     }
   }
 );
@@ -41,10 +40,29 @@ export const logIn = createAsyncThunk(
 export const logOut = createAsyncThunk("auth/LogOut", async (_, thunkApi) => {
   try {
     const response = await axios.post("/users/logout");
-    console.log("🚀 ~ response:", response);
     clearAuthHeader();
     return response.data;
   } catch (error) {
-    thunkApi.rejectWithValue(error.message);
+    return thunkApi.rejectWithValue(error.message);
   }
 });
+
+export const refreshUser = createAsyncThunk(
+  "auth/refresh",
+  async (_, thunkApi) => {
+    try {
+      const token = thunkApi.getState().auth.token;
+      setAuthHeader(token);
+      const response = await axios.get("/users/current");
+      return response.data;
+    } catch (error) {
+      return thunkApi.rejectWithValue(error.message);
+    }
+  },
+  {
+    condition(_, thunkApi) {
+      const token = thunkApi.getState().auth.token;
+      return token !== null;
+    },
+  }
+);

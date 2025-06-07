@@ -22,3 +22,11 @@ export const removeContact = createAsyncThunk(
     return response.data.id;
   }
 );
+
+export const editContact = createAsyncThunk(
+  "contacts/editContact",
+  async ({ newContact, id }) => {
+    const response = await axios.patch(`/contacts/${id}`, newContact);
+    return response.data;
+  }
+);
