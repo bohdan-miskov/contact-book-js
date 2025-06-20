@@ -9,6 +9,8 @@ import Loader from "../Loader/Loader";
 import Refreshing from "../Refreshing/Refreshing";
 import Layout from "../Layout/Layout";
 import { refreshUser } from "../../redux/auth/operations";
+import { Toaster } from "react-hot-toast";
+import { checkModalExpiration } from "../../redux/removeModal/slice";
 
 const HomePage = lazy(() => import("../../pages/HomePage/HomePage"));
 const ContactsPage = lazy(() =>
@@ -28,6 +30,7 @@ function App() {
 
   useEffect(() => {
     dispatch(refreshUser());
+    dispatch(checkModalExpiration());
   }, [dispatch]);
 
   return isRefreshing ? (
@@ -55,6 +58,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
+      <Toaster position="top-center" reverseOrder={false} />
     </Layout>
   );
 }

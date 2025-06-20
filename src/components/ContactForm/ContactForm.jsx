@@ -7,14 +7,23 @@ import { useDispatch, useSelector } from "react-redux";
 import { addContact, editContact } from "../../redux/contacts/operations";
 import { selectEditingContact } from "../../redux/contacts/selectors";
 import { clearEditId } from "../../redux/contacts/slice";
+import toast from "react-hot-toast";
 
 export default function ContactForm() {
   const id = useId();
   const dispatch = useDispatch();
   const editingContact = useSelector(selectEditingContact);
 
-  const handleAddContact = (contact) => dispatch(addContact(contact));
-  const handleEditContact = (editData) => dispatch(editContact(editData));
+  const handleAddContact = (contact) =>
+    dispatch(addContact(contact))
+      .unwrap()
+      .then(() => toast.success("Contact saved successfully!"))
+      .catch(() => {});
+  const handleEditContact = (editData) =>
+    dispatch(editContact(editData))
+      .unwrap()
+      .then(() => toast.success("Contact saved successfully!"))
+      .catch(() => {});
 
   const handleSubmit = (values, helpers) => {
     const newContact = { name: values.username, number: values.number };
@@ -23,7 +32,7 @@ export default function ContactForm() {
         newContact,
         id: editingContact.id,
       });
-      clearEditId();
+      dispatch(clearEditId());
     } else {
       handleAddContact(newContact);
     }
